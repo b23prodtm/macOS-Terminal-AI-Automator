@@ -95,7 +95,8 @@ if [[ -z "${GROQ_API_KEY:-}" ]]; then
     warn "GROQ_API_KEY is not set in your current environment."
     if [[ -n "$RC_FILE" ]] && [[ -t 0 ]] && ! grep -q "GROQ_API_KEY" "$RC_FILE" 2>/dev/null; then
         warn "Note: saving your key to $RC_FILE stores it in plaintext on disk. Anyone with access to your dotfiles (or their backups) could read it. For stronger protection, consider storing it in the macOS Keychain instead (e.g. 'security add-generic-password') and exporting it from there."
-        read -r -p "Enter your Groq API key now to save it to $RC_FILE (leave blank to skip): " API_KEY_INPUT || API_KEY_INPUT=""
+        read -rs -p "Enter your Groq API key now to save it to $RC_FILE (leave blank to skip): " API_KEY_INPUT || API_KEY_INPUT=""
+        echo
         if [[ -n "${API_KEY_INPUT:-}" ]]; then
             # Single-quote the value and escape any embedded single quotes so
             # the key is written safely regardless of special characters.
