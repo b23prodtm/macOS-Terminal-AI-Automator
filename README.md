@@ -106,8 +106,8 @@ If you installed via the `.pkg` (Option B) or ran `scripts/setup.sh` (Option A),
 
 If you'd rather configure shortcuts by hand, add these lines to your ~/.zshrc:
 
-alias ai="python /absolute/path/to/macos-terminal-ai-automator/scripts/ai.py"
-alias ag="python /absolute/path/to/macos-terminal-ai-automator/scripts/ag.py"
+alias ai="python3 /absolute/path/to/macos-terminal-ai-automator/scripts/ai.py"
+alias ag="python3 /absolute/path/to/macos-terminal-ai-automator/scripts/ag.py"
 
 Reload your shell:
 

@@ -56,7 +56,9 @@ cp "$REPO_ROOT/requirements.txt" "$LIB_DEST/requirements.txt"
 cp "$PKG_DIR/bin/ai" "$BIN_DEST/ai"
 cp "$PKG_DIR/bin/ag" "$BIN_DEST/ag"
 
+shopt -s nullglob
 chmod +x "$LIB_DEST"/*.py "$BIN_DEST/ai" "$BIN_DEST/ag"
+shopt -u nullglob
 
 mkdir -p "$DIST_DIR"
 
