@@ -44,6 +44,9 @@ trap cleanup EXIT
 echo "=== Building macos-terminal-ai-automator.pkg (v$VERSION) ==="
 
 # --- Assemble payload --------------------------------------------------------
+# NOTE: these install paths must stay in sync with LIB_DIR/BIN_DIR in
+# pkg/scripts/postinstall, since that script runs standalone on the target
+# machine after installation and cannot source this build script.
 LIB_DEST="$PAYLOAD_DIR/usr/local/lib/macos-terminal-ai-automator"
 BIN_DEST="$PAYLOAD_DIR/usr/local/bin"
 

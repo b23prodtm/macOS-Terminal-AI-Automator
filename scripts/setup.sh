@@ -124,7 +124,13 @@ if [[ -z "${GROQ_API_KEY:-}" ]]; then
             info "Skipped. You can add it later with: export GROQ_API_KEY=\"YOUR_KEY\""
         fi
     else
-        info "Add it manually by running: export GROQ_API_KEY=\"YOUR_KEY\" (and put that line in your shell's startup file so it persists)."
+        if [[ -z "$RC_FILE" ]]; then
+            info "No supported rc file detected for shell '$CURRENT_SHELL'. Add it manually by running: export GROQ_API_KEY=\"YOUR_KEY\" (and put that line in your shell's startup file so it persists)."
+        elif [[ ! -t 0 ]]; then
+            info "Running non-interactively, so the key prompt was skipped. Add it manually by running: export GROQ_API_KEY=\"YOUR_KEY\" (and put that line in your shell's startup file so it persists)."
+        else
+            info "GROQ_API_KEY already referenced in $RC_FILE; leaving it unchanged."
+        fi
     fi
 else
     ok "GROQ_API_KEY is already set"
