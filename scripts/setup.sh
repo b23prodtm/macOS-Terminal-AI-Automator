@@ -56,8 +56,15 @@ fi
 ok "Python dependencies installed"
 
 # --- 3. Make scripts executable ----------------------------------------------
-chmod +x "$SCRIPTS_DIR"/*.py
-ok "Made scripts executable"
+shopt -s nullglob
+py_files=("$SCRIPTS_DIR"/*.py)
+shopt -u nullglob
+if [[ ${#py_files[@]} -gt 0 ]]; then
+    chmod +x "${py_files[@]}"
+    ok "Made scripts executable"
+else
+    warn "No .py scripts found in $SCRIPTS_DIR to make executable"
+fi
 
 # --- 4. Configure shell aliases ----------------------------------------------
 case "$CURRENT_SHELL" in
@@ -89,8 +96,11 @@ if [[ -z "${GROQ_API_KEY:-}" ]]; then
         warn "Note: saving your key to $RC_FILE stores it in plaintext on disk. Anyone with access to your dotfiles (or their backups) could read it. For stronger protection, consider storing it in the macOS Keychain instead (e.g. 'security add-generic-password') and exporting it from there."
         read -r -p "Enter your Groq API key now to save it to $RC_FILE (leave blank to skip): " API_KEY_INPUT || API_KEY_INPUT=""
         if [[ -n "${API_KEY_INPUT:-}" ]]; then
+            # Single-quote the value and escape any embedded single quotes so
+            # the key is written safely regardless of special characters.
+            ESCAPED_KEY=${API_KEY_INPUT//\'/\'\\\'\'}
             {
-                echo "export GROQ_API_KEY=\"$API_KEY_INPUT\""
+                printf 'export GROQ_API_KEY='\''%s'\''\n' "$ESCAPED_KEY"
             } >> "$RC_FILE"
             ok "Saved GROQ_API_KEY to $RC_FILE"
         else
