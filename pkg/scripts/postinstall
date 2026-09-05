@@ -9,7 +9,12 @@ set -e
 LIB_DIR="/usr/local/lib/macos-terminal-ai-automator"
 BIN_DIR="/usr/local/bin"
 
-chmod +x "$LIB_DIR"/*.py 2>/dev/null || true
+shopt -s nullglob
+py_files=("$LIB_DIR"/*.py)
+if [[ ${#py_files[@]} -gt 0 ]]; then
+    chmod +x "${py_files[@]}"
+fi
+shopt -u nullglob
 chmod +x "$BIN_DIR/ai" "$BIN_DIR/ag" 2>/dev/null || true
 
 if command -v python3 >/dev/null 2>&1; then

@@ -106,6 +106,8 @@ if [[ -z "${GROQ_API_KEY:-}" ]]; then
         else
             info "Skipped. You can add it later with: export GROQ_API_KEY=\"YOUR_KEY\""
         fi
+    else
+        info "Add it manually by running: export GROQ_API_KEY=\"YOUR_KEY\" (and put that line in your shell's startup file so it persists)."
     fi
 else
     ok "GROQ_API_KEY is already set"

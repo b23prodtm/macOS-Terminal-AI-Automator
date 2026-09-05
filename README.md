@@ -50,7 +50,7 @@ Prefer a native installer? Build and install a `.pkg` package:
 ./pkg/build_pkg.sh
 
 # Install it (double-click the .pkg in Finder, or from the terminal)
-sudo installer -pkg dist/macos-terminal-ai-automator-1.0.0.pkg -target /
+sudo installer -pkg "dist/macos-terminal-ai-automator-$(cat VERSION).pkg" -target /
 
 The `.pkg` installs:
 	•	`ai.py` / `ag.py` → `/usr/local/lib/macos-terminal-ai-automator/`

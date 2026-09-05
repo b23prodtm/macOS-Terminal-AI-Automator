@@ -22,10 +22,10 @@ if ! command -v pkgbuild >/dev/null 2>&1; then
     exit 1
 fi
 
-VERSION="${1:-1.0.0}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VERSION="${1:-$(cat "$REPO_ROOT/VERSION" 2>/dev/null || echo "1.0.0")}"
 IDENTIFIER="com.b23prodtm.macos-terminal-ai-automator"
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG_DIR="$REPO_ROOT/pkg"
 BUILD_DIR="$(mktemp -d)"
 PAYLOAD_DIR="$BUILD_DIR/payload"
