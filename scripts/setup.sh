@@ -40,8 +40,17 @@ if ! command -v pip3 >/dev/null 2>&1; then
 fi
 ok "Found pip3"
 
-RUNNING_SHELL="$(ps -p "$PPID" -o comm= 2>/dev/null | tr -d '-' | xargs -n1 basename 2>/dev/null || true)"
-CURRENT_SHELL="$(basename "${RUNNING_SHELL:-${SHELL:-sh}}")"
+# Prefer the user's configured login shell ($SHELL), since that's what
+# determines which rc file (~/.zshrc or ~/.bash_profile) is sourced for new
+# terminal sessions. Fall back to the parent process (the shell that actually
+# invoked this script) if $SHELL is unset or unrecognized.
+LOGIN_SHELL="$(basename "${SHELL:-}" 2>/dev/null || true)"
+if [[ "$LOGIN_SHELL" == "zsh" || "$LOGIN_SHELL" == "bash" ]]; then
+    CURRENT_SHELL="$LOGIN_SHELL"
+else
+    RUNNING_SHELL="$(ps -p "$PPID" -o comm= 2>/dev/null | tr -d '-' | xargs -n1 basename 2>/dev/null || true)"
+    CURRENT_SHELL="$(basename "${RUNNING_SHELL:-${LOGIN_SHELL:-sh}}")"
+fi
 if [[ "$CURRENT_SHELL" != "zsh" && "$CURRENT_SHELL" != "bash" ]]; then
     warn "Unsupported shell detected ($CURRENT_SHELL). Alias setup will be skipped."
 fi
@@ -99,13 +108,18 @@ if [[ -z "${GROQ_API_KEY:-}" ]]; then
         read -rs -p "Enter your Groq API key now to save it to $RC_FILE (leave blank to skip): " API_KEY_INPUT || API_KEY_INPUT=""
         echo
         if [[ -n "${API_KEY_INPUT:-}" ]]; then
-            # Single-quote the value and escape any embedded single quotes so
-            # the key is written safely regardless of special characters.
-            ESCAPED_KEY=${API_KEY_INPUT//\'/\'\\\'\'}
-            {
-                printf 'export GROQ_API_KEY='\''%s'\''\n' "$ESCAPED_KEY"
-            } >> "$RC_FILE"
-            ok "Saved GROQ_API_KEY to $RC_FILE"
+            read -r -p "Write this key to $RC_FILE in plaintext? [y/N]: " CONFIRM_WRITE || CONFIRM_WRITE=""
+            if [[ "$CONFIRM_WRITE" =~ ^[Yy]$ ]]; then
+                # Single-quote the value and escape any embedded single quotes so
+                # the key is written safely regardless of special characters.
+                ESCAPED_KEY=${API_KEY_INPUT//\'/\'\\\'\'}
+                {
+                    printf 'export GROQ_API_KEY='\''%s'\''\n' "$ESCAPED_KEY"
+                } >> "$RC_FILE"
+                ok "Saved GROQ_API_KEY to $RC_FILE"
+            else
+                info "Not saved. You can add it later with: export GROQ_API_KEY=\"YOUR_KEY\""
+            fi
         else
             info "Skipped. You can add it later with: export GROQ_API_KEY=\"YOUR_KEY\""
         fi
