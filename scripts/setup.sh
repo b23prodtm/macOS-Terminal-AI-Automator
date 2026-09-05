@@ -40,7 +40,8 @@ if ! command -v pip3 >/dev/null 2>&1; then
 fi
 ok "Found pip3"
 
-CURRENT_SHELL="$(basename "${SHELL:-sh}")"
+RUNNING_SHELL="$(ps -p "$PPID" -o comm= 2>/dev/null | tr -d '-' | xargs -n1 basename 2>/dev/null || true)"
+CURRENT_SHELL="$(basename "${RUNNING_SHELL:-${SHELL:-sh}}")"
 if [[ "$CURRENT_SHELL" != "zsh" && "$CURRENT_SHELL" != "bash" ]]; then
     warn "Unsupported shell detected ($CURRENT_SHELL). Alias setup will be skipped."
 fi
