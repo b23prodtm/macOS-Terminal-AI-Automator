@@ -15,27 +15,49 @@ No more memorizing commands – just tell the AI what you need.
 
 ⸻
 
-**Install**
-
-
-chmod +x scripts/*.py    # Make scripts executable
-
-or if you're confused, just simply put the scripts (ag.py and ai.py) in your home folder ( for example Users/davidpearson/ )
-
- and run these commands:
- 
-chmod +x ~/ai.py
-chmod +x ~/ag.py
-
-Here’s the full text for the updated part of your README (Requirements + API Key Setup + Install Instructions):
-
-⸻
-
 🛠 Requirements
 	•	macOS
 	•	Python 3.x
 	•	Groq API Key (Free) → Get yours here
 	•	Internet connection
+
+⸻
+
+**Install (Option A — Automated Setup Script)**
+
+The fastest way to get going is the bundled setup script. From the repo root:
+
+git clone https://github.com/b23prodtm/macOS-Terminal-AI-Automator.git
+cd macOS-Terminal-AI-Automator
+./scripts/setup.sh
+
+`scripts/setup.sh` will:
+	•	Verify Python 3 and a supported shell (zsh/bash) are available
+	•	Install the required Python dependencies (`groq`, `rich`) via `pip3 install --user -r requirements.txt`
+	•	Make `scripts/ai.py` and `scripts/ag.py` executable
+	•	Add `ai` / `ag` aliases to your `~/.zshrc` or `~/.bash_profile`
+	•	Optionally prompt you to save your `GROQ_API_KEY`
+
+After it finishes, reload your shell (`source ~/.zshrc`) and you're ready to go.
+
+⸻
+
+**Install (Option B — macOS .pkg Installer)**
+
+Prefer a native installer? Build and install a `.pkg` package:
+
+# Build the package (must be run on macOS)
+./pkg/build_pkg.sh
+
+# Install it (double-click the .pkg in Finder, or from the terminal)
+sudo installer -pkg "dist/macos-terminal-ai-automator-$(cat VERSION).pkg" -target /
+
+The `.pkg` installs:
+	•	`ai.py` / `ag.py` → `/usr/local/lib/macos-terminal-ai-automator/`
+	•	`ai` / `ag` launcher commands → `/usr/local/bin/`
+	•	A postinstall script that installs the Python dependencies (`groq`, `rich`) for you
+
+Since `/usr/local/bin` is on the default macOS `PATH`, you can immediately run `ai` and `ag` from any terminal after installation — no aliases needed. You'll still need to set your `GROQ_API_KEY` (see below).
 
 ⸻
 
@@ -63,31 +85,29 @@ source ~/.zshrc
 
 ⸻
 
-**📦 Install Requirements**
-
-Ensure Python is installed:
-
-brew install python
-
 **Usage**
 
-Run AI assistant:
+Once installed (via either option above), just run:
 
-python scripts/ai.py "how do I kill a process by name?"
+ai "how do I kill a process by name?"
+ag "create 10 folders in Documents with a .txt file inside each"
 
-Run automation tool:
+Or, without installing, you can always run the scripts directly with Python:
 
-python scripts/ag.py "create 10 folders in Documents with a .txt file inside each"
+python3 scripts/ai.py "how do I kill a process by name?"
+python3 scripts/ag.py "create 10 folders in Documents with a .txt file inside each"
 
 
 ⸻
 
- **Make It Easier (Add Shortcuts)**
+ **Make It Easier (Add Shortcuts Manually)**
 
-If you use zsh (macOS default), add these lines to your ~/.zshrc:
+If you installed via the `.pkg` (Option B) or ran `scripts/setup.sh` (Option A), `ai` and `ag` are already set up — you can skip this section.
 
-alias ai="python /absolute/path/to/macos-terminal-ai-automator/scripts/ai.py"
-alias ag="python /absolute/path/to/macos-terminal-ai-automator/scripts/ag.py"
+If you'd rather configure shortcuts by hand, add these lines to your ~/.zshrc:
+
+alias ai="python3 /absolute/path/to/macos-terminal-ai-automator/scripts/ai.py"
+alias ag="python3 /absolute/path/to/macos-terminal-ai-automator/scripts/ag.py"
 
 Reload your shell:
 

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# postinstall - runs automatically after the .pkg payload is installed.
+#
+# Note: macOS runs postinstall scripts as root, so `pip install --user` here
+# would otherwise install into root's home directory rather than the
+# logged-in user's. We detect the console (logged-in) user and run pip as
+# them so the dependencies land where `ai`/`ag` will actually look for them.
+#
+# Ensures the installed scripts/wrappers are executable and installs the
+# required Python dependencies for the console user.
+set -e
+
+LIB_DIR="/usr/local/lib/macos-terminal-ai-automator"
+BIN_DIR="/usr/local/bin"
+LOG_FILE="/tmp/macos-terminal-ai-automator-postinstall.log"
+
+py_files=()
+for f in "$LIB_DIR"/*.py; do
+    [[ -e "$f" ]] && py_files+=("$f")
+done
+if [[ ${#py_files[@]} -gt 0 ]]; then
+    if ! chmod +x "${py_files[@]}"; then
+        echo "⚠️ Failed to make ${py_files[*]} executable." >> "$LOG_FILE"
+    fi
+fi
+if ! chmod +x "$BIN_DIR/ai" "$BIN_DIR/ag" 2>>"$LOG_FILE"; then
+    echo "⚠️ Failed to make $BIN_DIR/ai and/or $BIN_DIR/ag executable." >> "$LOG_FILE"
+fi
+
+# Determine the logged-in console user (falling back to $USER) so pip
+# installs into their home directory instead of root's.
+CONSOLE_USER="$(stat -f%Su /dev/console 2>/dev/null || true)"
+if [[ -z "$CONSOLE_USER" || "$CONSOLE_USER" == "root" ]]; then
+    CONSOLE_USER="${SUDO_USER:-${USER:-root}}"
+fi
+
+run_as_console_user() {
+    if [[ "$CONSOLE_USER" != "root" && "$(id -u)" -eq 0 ]]; then
+        sudo -u "$CONSOLE_USER" "$@"
+    else
+        "$@"
+    fi
+}
+
+if command -v python3 >/dev/null 2>&1; then
+    if [[ -f "$LIB_DIR/requirements.txt" ]]; then
+        if ! run_as_console_user python3 -m pip install --user -r "$LIB_DIR/requirements.txt" \
+                >>"$LOG_FILE" 2>&1; then
+            echo "⚠️ Failed to install Python dependencies automatically for user '$CONSOLE_USER'. Run manually: pip3 install --user -r $LIB_DIR/requirements.txt (see $LOG_FILE for details)"
+        fi
+    else
+        if ! run_as_console_user python3 -m pip install --user groq rich \
+                >>"$LOG_FILE" 2>&1; then
+            echo "⚠️ Failed to install Python dependencies automatically for user '$CONSOLE_USER'. Run manually: pip3 install --user groq rich (see $LOG_FILE for details)"
+        fi
+    fi
+else
+    echo "⚠️ python3 not found; install Python 3 and run: pip3 install --user groq rich" \
+        >> "$LOG_FILE"
+fi
+
+exit 0
