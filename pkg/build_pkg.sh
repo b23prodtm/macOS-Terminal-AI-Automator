@@ -23,7 +23,14 @@ if ! command -v pkgbuild >/dev/null 2>&1; then
 fi
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${1:-$(cat "$REPO_ROOT/VERSION" 2>/dev/null || echo "1.0.0")}"
+if [[ -n "${1:-}" ]]; then
+    VERSION="$1"
+elif [[ -f "$REPO_ROOT/VERSION" ]]; then
+    VERSION="$(cat "$REPO_ROOT/VERSION")"
+else
+    echo "❌ No version specified and $REPO_ROOT/VERSION not found. Pass a version explicitly: ./pkg/build_pkg.sh <version>" >&2
+    exit 1
+fi
 IDENTIFIER="com.b23prodtm.macos-terminal-ai-automator"
 
 PKG_DIR="$REPO_ROOT/pkg"
@@ -56,9 +63,7 @@ cp "$REPO_ROOT/requirements.txt" "$LIB_DEST/requirements.txt"
 cp "$PKG_DIR/bin/ai" "$BIN_DEST/ai"
 cp "$PKG_DIR/bin/ag" "$BIN_DEST/ag"
 
-shopt -s nullglob
-chmod +x "$LIB_DEST"/*.py "$BIN_DEST/ai" "$BIN_DEST/ag"
-shopt -u nullglob
+chmod +x "$LIB_DEST/ai.py" "$LIB_DEST/ag.py" "$BIN_DEST/ai" "$BIN_DEST/ag"
 
 mkdir -p "$DIST_DIR"
 

@@ -56,9 +56,10 @@ fi
 ok "Python dependencies installed"
 
 # --- 3. Make scripts executable ----------------------------------------------
-shopt -s nullglob
-py_files=("$SCRIPTS_DIR"/*.py)
-shopt -u nullglob
+py_files=()
+for f in "$SCRIPTS_DIR"/*.py; do
+    [[ -e "$f" ]] && py_files+=("$f")
+done
 if [[ ${#py_files[@]} -gt 0 ]]; then
     chmod +x "${py_files[@]}"
     ok "Made scripts executable"
