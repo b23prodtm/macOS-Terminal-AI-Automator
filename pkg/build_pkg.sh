@@ -42,8 +42,17 @@ BIN_DEST="$PAYLOAD_DIR/usr/local/bin"
 
 mkdir -p "$LIB_DEST" "$BIN_DEST"
 
+for f in "$REPO_ROOT/scripts/ai.py" "$REPO_ROOT/scripts/ag.py" "$REPO_ROOT/requirements.txt" \
+         "$PKG_DIR/bin/ai" "$PKG_DIR/bin/ag"; do
+    if [[ ! -f "$f" ]]; then
+        echo "❌ Required file not found: $f" >&2
+        exit 1
+    fi
+done
+
 cp "$REPO_ROOT/scripts/ai.py" "$LIB_DEST/ai.py"
 cp "$REPO_ROOT/scripts/ag.py" "$LIB_DEST/ag.py"
+cp "$REPO_ROOT/requirements.txt" "$LIB_DEST/requirements.txt"
 cp "$PKG_DIR/bin/ai" "$BIN_DEST/ai"
 cp "$PKG_DIR/bin/ag" "$BIN_DEST/ag"
 
