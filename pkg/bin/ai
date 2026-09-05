@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Wrapper installed at /usr/local/bin/ai
+exec python3 /usr/local/lib/macos-terminal-ai-automator/ai.py "$@"

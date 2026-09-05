@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# postinstall - runs automatically after the .pkg payload is installed.
+#
+# Ensures the installed scripts/wrappers are executable and installs the
+# required Python dependencies for the current user.
+set -e
+
+LIB_DIR="/usr/local/lib/macos-terminal-ai-automator"
+BIN_DIR="/usr/local/bin"
+
+chmod +x "$LIB_DIR"/*.py 2>/dev/null || true
+chmod +x "$BIN_DIR/ai" "$BIN_DIR/ag" 2>/dev/null || true
+
+if command -v python3 >/dev/null 2>&1; then
+    python3 -m pip install --user groq rich >/tmp/macos-terminal-ai-automator-postinstall.log 2>&1 || true
+else
+    echo "⚠️ python3 not found; install Python 3 and run: pip3 install --user groq rich" \
+        >> /tmp/macos-terminal-ai-automator-postinstall.log
+fi
+
+exit 0
